@@ -1,0 +1,42 @@
+dataset_path: lmms-lab/ScienceQA
+dataset_name: ScienceQA-FULL
+task: "scienceqa_llama_plain"
+dataset_kwargs:
+  token: True
+test_split: test
+output_type: generate_until
+fewshot_delimiter: "</s>"
+doc_to_visual: !function utils.sqa_doc_to_visual
+doc_to_text: !function utils.prompt_llama_plain
+doc_to_target: !function utils.sqa_doc_to_target
+generation_kwargs:
+  max_new_tokens: 16
+  max_length: 2048 #No limit
+  do_sample: false
+  until:
+  - 'User:'
+  - '"'
+  - ':'
+  - '.'
+  - ','
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+    ignore_case: true
+    ignore_punctuation: true
+filter_list:
+  - name: "extract_answer"
+    filter: 
+      - function: "regex"
+        regex_pattern: '(.+?)[:\n\r".]'
+      - function: "answermapping"
+process_results: !function utils.answer_mapping
+model_specific_prompt_kwargs:
+  default:
+    format: default
+    pre_prompt: ""
+    post_prompt: ""
+
+metadata:
+  version: 1.0
