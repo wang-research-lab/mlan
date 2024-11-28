@@ -1,0 +1,34 @@
+dataset_path: hellaswag
+process_docs: !function utils.process_docs_em
+doc_to_text: "{{query}}"
+doc_to_target: "{{gold}}"
+fewshot_delimiter: \n\n
+generation_kwargs:
+  until:
+  - 'User:'
+  - '"'
+  - ':'
+  - '.'
+  - ','
+  do_sample: false
+  max_length: 2048
+  max_new_tokens: 16
+metadata:
+  version: 1.0
+metric_list:
+- aggregation: mean
+  higher_is_better: true
+  ignore_case: true
+  metric: exact_match
+num_fewshot: 0
+output_type: generate_until
+repeats: 1
+should_decontaminate: false
+target_delimiter: ' '
+task: hellaswag_em
+training_split: train
+validation_split: validation
+filter_list:
+  - name: "custom_filter_pipeline"
+    filter:
+      - function: answermapping_hellaswag
